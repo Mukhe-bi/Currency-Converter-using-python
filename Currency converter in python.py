@@ -1,0 +1,42 @@
+import requests
+
+def currency_converter(amount, from_currency, to_currency):
+    # Set the API endpoint for currency conversion
+    api_endpoint = f"https://api.exchangerate-api.com/v4/latest/{from_currency}"
+
+    # Send a GET request to the API endpoint
+    response = requests.get(api_endpoint)
+
+    # Check if the response was successful
+    if response.status_code != 200:
+        # If the response was not successful, raise an error with the status code
+        raise ValueError(f"API call failed with status code {response.status_code}")
+
+    # Get the JSON data from the response
+    data = response.json()
+
+    # Check if the target currency code is valid
+    if to_currency not in data["rates"]:
+        # If the target currency code is not valid, raise an error
+        raise ValueError(f"Target currency code {to_currency} is not supported by the API")
+
+    # Extract the exchange rate for the target currency
+    exchange_rate = data["rates"][to_currency]
+
+    # Calculate the converted amount
+    converted_amount = amount * exchange_rate
+
+    # Return the converted amount
+    return converted_amount
+
+# Prompt the user to enter the amount, source currency, and target currency
+amount = float(input("Enter the amount: "))
+from_currency = input("Enter the source currency code: ").upper()
+to_currency = input("Enter the target currency code: ").upper()
+
+# Convert the currency and print the result
+try:
+    result = currency_converter(amount, from_currency, to_currency)
+    print(f"{amount} {from_currency} is equal to {result} {to_currency}")
+except ValueError as error:
+    print(f"Error: {error}")
